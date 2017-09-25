@@ -11,7 +11,7 @@ barBinary = TrackBar("converToBinary")
 barBinary.creatTrackbar(['threshold:'],[(0,255)])
 #Trackbar Test
 
-img = cv2.imread(".\\picture\\track1.jpg")
+img = cv2.imread(".\\vision\\picture\\redball.jpg")
 cv2.imshow('ORIGIN', img)
 ball = FindBall(img,debugFlag = True)
 while True :

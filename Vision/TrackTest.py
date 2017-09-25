@@ -4,7 +4,7 @@ from FindObject import *
 from DebugUI import TrackBar
 #Trackbar Test
 nameList = ['Hmin',"Smin","Vmin","Hmax","Smax","Vmax"]
-valueRange=[(0,255),(0,255),(0,255),(255,255),(255,255),(255,255)]
+valueRange=[(70,255),(70,255),(0,255),(255,255),(255,255),(255,255)]
 trackbar = TrackBar("Track Test")
 trackbar.creatTrackbar(nameList,valueRange)
 barBinary = TrackBar("converToBinary") 
