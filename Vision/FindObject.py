@@ -198,18 +198,29 @@ class FindTrack(FindObject):
         self.imgSize = img.shape
         self.Middle = Line(self.imgSize[1]/2,0,float("inf"))
         print ("A FindTrack Class is created!")
-    def getCenter(self,minVal=50,maxVal=150,\
+    def getCenter(self,blurSize=15,minVal=50,maxVal=150,\
         linePointCount=60,minLineLength=120,maxLineGap=10,\
         slopeThreshold=math.tan(math.pi/6)):
-        
-        #self.tempImg=self.dilate(ksize=(2,2))
-        self.tempImg = cv2.medianBlur(self.binary.copy(),15)
-        self.edges = cv2.Canny(self.tempImg.copy(),minVal,maxVal)
+        '''Get the middle line of the track
+            input:
+                blurSize=15,        #size for blur
+                minVal=50,          #value for edges
+                maxVal=150,         #value for edges
+                linePointCount=60,  #value for HoughLinesP
+                minLineLength=120,  #value for HoughLinesP
+                maxLineGap=10,      #value for HoughLinesP
+                slopeThreshold=math.tan(math.pi/6)        #the slope to del some lines
+            output:
+                Line::Middle         #euqation of the middle line   
+        '''
+        #Blur Canny HoughLines. To get lines in the picture.
+        self.blurtImg = cv2.medianBlur(self.binary.copy(),15)
+        self.edges = cv2.Canny(self.blurtImg.copy(),minVal,maxVal)
         self.lines = cv2.HoughLinesP(self.edges,1,numpy.pi/180,linePointCount,minLineLength,maxLineGap) 
         if self.lines is not None:
+            #separate left and right lines according to slope
             self.leftLines = []
-            self.rightLines = []
-            
+            self.rightLines = []           
             for item in self.lines:
                 x1 = item[0][0]
                 y1 = item[0][1]
@@ -226,65 +237,72 @@ class FindTrack(FindObject):
                     self.leftLines.append(item[0])
                 if (k > slopeThreshold ):
                     self.rightLines.append(item[0])
-            if self.debugFlag is True:
-                self.lineTemp = self.img.copy()
-                self.imgSize = self.lineTemp.shape
-                if self.leftLines is not None :
-                    for item in self.leftLines:
-                        cv2.line(self.lineTemp,(item[0],item[1]),(item[2],item[3]  ),(255,0,0),3)
-                if self.rightLines is not None :
-                    for item in self.rightLines:
-                        cv2.line(self.lineTemp,(item[0],item[1]),(item[2],item[3]  ),(0,0,255),3)              
-                tempMiddleX =[0,0]
-                tempMiddleY =[0,0]
-                if self.leftLines is not None and self.rightLines is not None:
-                    count = min(len(self.rightLines),len(self.leftLines))
-                    i=0 
-                    sumRX=[0,0]
-                    sumLX=[0,0]
-                    while(i < count ):
+            #get middle line equation
+            self.lineTemp = self.img.copy()
+            self.imgSize = self.lineTemp.shape           
+            tempMiddleX =[0,0]
+            tempMiddleY =[0,0]
+            if len(self.leftLines)>0 and len(self.rightLines)>0:  
+                count = min(len(self.rightLines),len(self.leftLines))
+                i=0 
+                sumRX=[0,0]
+                sumLX=[0,0]
+                #We use points from left line and rignt line to get the middle line point
+                while(i < count ):
+                    #kL left line slope;kR right line slope
+                    if ((self.leftLines[i][2]-self.leftLines[i][0]) == 0):
+                        kL = float("inf")
+                    else:
                         kL =  (self.leftLines[i][3]-self.leftLines[i][1])*1.0/(self.leftLines[i][2]-self.leftLines[i][0])
-                        kR =  (self.rightLines[i][3]-self.rightLines[i][1])*1.0/(self.rightLines[i][2]-self.rightLines[i][0])
-                        LineL = Line(self.leftLines[i][0],self.leftLines[i][1],kL)
-                        LineR = Line(self.rightLines[i][0],self.rightLines[i][1],kR) 
-                        sumLX[0] = sumLX[0] + LineL.getX(self.imgSize[0]*1.0/2)
-                        sumLX[1] = sumLX[1] + LineL.getX(self.imgSize[0]*1.0*2/3)
-                        sumRX[0] = sumRX[0] + LineR.getX(self.imgSize[0]*1.0/2)
-                        sumRX[1] = sumRX[1] + LineR.getX(self.imgSize[0]*1.0*2/3)
-                        i = i + 1
-                    tempMiddleY[0] = self.imgSize[0]*1.0/2
-                    tempMiddleY[1] = self.imgSize[0]*1.0*2/3
-                    tempMiddleX[0] = (sumLX[0]*1.0/count+sumRX[0]*1.0/count)/2.0
-                    tempMiddleX[1] = (sumLX[1]*1.0/count+sumRX[1]*1.0/count)/2.0
-                    
-                    if tempMiddleX[1] == tempMiddleX[0] :
-                        tempMiddleK = float("inf")
-                    else :
-                        tempMiddleK = (tempMiddleY[1]-tempMiddleY[0])*1.0 /(tempMiddleX[1]-tempMiddleX[0])
-                    self.Middle.update(tempMiddleX[0],tempMiddleY[0],tempMiddleK)
-                    cv2.line(self.lineTemp,\
-                    (int(self.Middle.getX(0)),0),\
-                    (int(self.Middle.getX(self.imgSize[0])),self.imgSize[0]),\
-                    (0,255,255),3)
+                    if ((self.rightLines[i][2]-self.rightLines[i][0]) == 0):
+                        kR = float("inf")
+                    else:
+                        kR =  (self.rightLines[i][3]-self.rightLines[i][1])*1.0/(self.rightLines[i][2]-self.rightLines[i][0])                  
+                    #LineL LineR,The equation of left line and right line
+                    LineL = Line(self.leftLines[i][0],self.leftLines[i][1],kL)
+                    LineR = Line(self.rightLines[i][0],self.rightLines[i][1],kR) 
+                    sumLX[0] = sumLX[0] + LineL.getX(self.imgSize[0]*1.0/2)
+                    sumLX[1] = sumLX[1] + LineL.getX(self.imgSize[0]*1.0*2/3)
+                    sumRX[0] = sumRX[0] + LineR.getX(self.imgSize[0]*1.0/2)
+                    sumRX[1] = sumRX[1] + LineR.getX(self.imgSize[0]*1.0*2/3)
+                    i = i + 1
+                tempMiddleY[0] = self.imgSize[0]*1.0/2
+                tempMiddleY[1] = self.imgSize[0]*1.0*2/3
+                tempMiddleX[0] = (sumLX[0]*1.0/count+sumRX[0]*1.0/count)/2.0
+                tempMiddleX[1] = (sumLX[1]*1.0/count+sumRX[1]*1.0/count)/2.0
                 
-                cv2.line(self.lineTemp,(self.imgSize[1]/2,0),(self.imgSize[1]/2,self.imgSize[0]),(255,255,0),3)
-                cv2.line(self.lineTemp,(0,int(self.imgSize[0]*1.0/2)),(self.imgSize[1],int(self.imgSize[0]*1.0/2)),(255,255,0),1)
-                cv2.line(self.lineTemp,(0,int(self.imgSize[0]*1.0*2/3)),(self.imgSize[1],int(self.imgSize[0]*1.0*2/3)),(255,255,0),1)
-                cv2.imshow("Lines after slope choose",self.lineTemp)
-
+                if tempMiddleX[1] == tempMiddleX[0] :
+                    tempMiddleK = float("inf")
+                else :
+                    tempMiddleK = (tempMiddleY[1]-tempMiddleY[0])*1.0 /(tempMiddleX[1]-tempMiddleX[0])
+                #middle line equation
+                self.Middle.update(tempMiddleX[0],tempMiddleY[0],tempMiddleK)
+            else:
+                # if we can not get two side lines ,middle line is set to middle of the img
+                self.Middle.update(self.imgSize[1]/2,0,float("inf"))
+        else:
+            # if there are no lines,middle line is set to middle of the img
+            self.Middle.update(self.imgSize[1]/2,0,float("inf"))
         if self.debugFlag is True:
-            self.drawImg = self.img.copy()
-            if self.lines is not None:
-                #print (len(self.lines))
-                for items in self.lines:
-                    x1 = items[0][0]
-                    y1 = items[0][1]
-                    x2 = items[0][2]
-                    y2 = items[0][3]
-                    #print(items)
-                    cv2.line(self.drawImg,(x1,y1),(x2,y2),(0,255,0),3)
-            cv2.imshow("canny",self.edges)
-            cv2.imshow("houghLinesP",self.drawImg)
+            cv2.imshow("canny",self.edges)   
+            if self.leftLines is not None :
+                for item in self.leftLines:
+                    cv2.line(self.lineTemp,(item[0],item[1]),(item[2],item[3]  ),(255,0,0),3)
+            if self.rightLines is not None :
+                for item in self.rightLines:
+                    cv2.line(self.lineTemp,(item[0],item[1]),(item[2],item[3]  ),(0,0,255),3)       
+            cv2.line(self.lineTemp,(self.imgSize[1]/2,0),(self.imgSize[1]/2,self.imgSize[0]),(255,255,0),3)
+            cv2.line(self.lineTemp,(0,int(self.imgSize[0]*1.0/2)),(self.imgSize[1],int(self.imgSize[0]*1.0/2)),(255,255,0),1)
+            cv2.line(self.lineTemp,(0,int(self.imgSize[0]*1.0*2/3)),(self.imgSize[1],int(self.imgSize[0]*1.0*2/3)),(255,255,0),1)
+            cv2.line(self.lineTemp,\
+            (int(self.Middle.getX(0)),0),\
+            (int(self.Middle.getX(self.imgSize[0])),self.imgSize[0]),\
+            (0,255,255),3)
+            cv2.imshow("Lines after slope choose",self.lineTemp)
+            return self.Middle
+        else:
+            return self.Middle
+            
         
 
 
