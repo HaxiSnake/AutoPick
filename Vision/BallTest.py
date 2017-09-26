@@ -4,7 +4,7 @@ from FindObject import *
 from DebugUI import TrackBar
 #Trackbar Test
 nameList = ['Hmin',"Smin","Vmin","Hmax","Smax","Vmax"]
-valueRange=[(0,255),(0,255),(0,255),(255,255),(255,255),(255,255)]
+valueRange=[(0,255),(0,255),(0,255),(30,255),(255,255),(255,255)]
 trackbar = TrackBar("Test")
 trackbar.creatTrackbar(nameList,valueRange)
 barBinary = TrackBar("converToBinary") 
@@ -13,7 +13,7 @@ barBinary.creatTrackbar(['threshold:'],[(0,255)])
 
 img = cv2.imread(".\\vision\\picture\\redball.jpg")
 cv2.imshow('ORIGIN', img)
-ball = FindBall(img,debugFlag = True)
+ball = FindBall(img,debugFlag = False)
 while True :
     color = trackbar.getTrackbarValue()
     threshold = barBinary.getTrackbarValue()

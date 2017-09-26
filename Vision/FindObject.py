@@ -302,7 +302,21 @@ class FindTrack(FindObject):
             return self.Middle
         else:
             return self.Middle
-            
+    def draw(self):
+        if self.leftLines is not None :
+            for item in self.leftLines:
+                cv2.line(self.lineTemp,(item[0],item[1]),(item[2],item[3]  ),(255,0,0),3)
+        if self.rightLines is not None :
+            for item in self.rightLines:
+                cv2.line(self.lineTemp,(item[0],item[1]),(item[2],item[3]  ),(0,0,255),3)       
+        cv2.line(self.lineTemp,(self.imgSize[1]/2,0),(self.imgSize[1]/2,self.imgSize[0]),(255,255,0),3)
+        cv2.line(self.lineTemp,(0,int(self.imgSize[0]*1.0/2)),(self.imgSize[1],int(self.imgSize[0]*1.0/2)),(255,255,0),1)
+        cv2.line(self.lineTemp,(0,int(self.imgSize[0]*1.0*2/3)),(self.imgSize[1],int(self.imgSize[0]*1.0*2/3)),(255,255,0),1)
+        cv2.line(self.lineTemp,\
+        (int(self.Middle.getX(0)),0),\
+        (int(self.Middle.getX(self.imgSize[0])),self.imgSize[0]),\
+        (0,255,255),3)
+        cv2.imshow("FindTrack",self.lineTemp)
         
 
 

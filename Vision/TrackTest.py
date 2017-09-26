@@ -13,7 +13,7 @@ barBinary.creatTrackbar(['threshold:'],[(0,255)])
 
 img = cv2.imread(".\\Vision\\picture\\track5.jpg")
 cv2.imshow('ORIGIN', img)
-track = FindTrack(img,debugFlag = True)
+track = FindTrack(img,debugFlag = False)
 while True :
     color = trackbar.getTrackbarValue()
     threshold = barBinary.getTrackbarValue()
@@ -21,6 +21,7 @@ while True :
     track.hsvFilter(tuple(color[0:3]),tuple(color[3:]))
     track.converToBinary(threshold[0])
     track.getCenter(minVal=100,maxVal=300)
+    track.draw()
     if key == 27:
         break
 cv2.destroyAllWindows()
