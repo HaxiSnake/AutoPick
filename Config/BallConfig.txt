@@ -1,10 +1,10 @@
-Hmin:0
-Smin:0
+Hmin:5
+Smin:144
 Vmin:0
-Hmax:75
+Hmax:26
 Smax:255
 Vmax:255
-Threshold:0
-ContorMin:60
+Threshold:60
+ContorMin:145
 ContorMax:1441
 DilateKsize:4

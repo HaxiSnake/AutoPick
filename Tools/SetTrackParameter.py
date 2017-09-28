@@ -48,12 +48,12 @@ UseCamFlag= True
 #parameter get
 configFile = ".//Config//TrackConfig.txt"
 if FirstFlag is not True:
-    
     paraGet    = Parameter(configFile=configFile)
     nameList,paraList = paraGet.ReadConfig()
     for i in range(len(paraList)):
         valueRange[i][0]=paraList[i]
 #parameter get
+#special process for blur size
 if valueRange[7][0]%2 == 0:
     valueRange[7][0]=valueRange[7][0]+1
 #Trackbar 
@@ -62,17 +62,21 @@ trackbar.creatTrackbar(nameList,valueRange)
 #Trackbar 
 ret = False
 originImg = None
+img = None
 cap = None
+track = None
 if UseCamFlag is True:
     cap = cv2.VideoCapture(0)
     ret,originImg = cap.read()
 else:
     originImg = cv2.imread(".\\vision\\picture\\track5.jpg")
     ret = True
-cv2.imshow('ORIGIN', originImg)
-img = cv2.resize(originImg,None,fx=0.5,fy=0.5,interpolation=cv2.INTER_AREA)
-cv2.imshow('resize', img)
-track = FindTrack(img,debugFlag = True)
+if ret is True:
+    img = cv2.resize(originImg,None,fx=0.5,fy=0.5,interpolation=cv2.INTER_AREA)
+    track = FindTrack(img,debugFlag = True)
+else :
+    print("can not open camera!")
+    exit()
 '''
 parameterList:
 lower_color     :para[0:3]
@@ -93,7 +97,9 @@ while ret is True :
     track.updateImg(img)
     #get parameter
     para = trackbar.getTrackbarValue()
-    #get parameter
+    #special process for blur size
+    if para[7]%2 == 0:
+        para[7]=para[7]+1
     #img process
     track.hsvFilter(tuple(para[0:3]),tuple(para[3:6]))
     track.converToBinary(para[6])
