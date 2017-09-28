@@ -220,6 +220,7 @@ class FindTrack(FindObject):
         self.blurtImg = cv2.medianBlur(self.binary.copy(),15)
         self.edges = cv2.Canny(self.blurtImg.copy(),minVal,maxVal)
         self.lines = cv2.HoughLinesP(self.edges,1,numpy.pi/180,linePointCount,minLineLength,maxLineGap) 
+        self.lineTemp = self.img.copy()
         if self.lines is not None:
             #separate left and right lines according to slope
             self.leftLines = []
@@ -241,7 +242,6 @@ class FindTrack(FindObject):
                 if (k > slopeThreshold ):
                     self.rightLines.append(item[0])
             #get middle line equation
-            self.lineTemp = self.img.copy()
             self.imgSize = self.lineTemp.shape           
             tempMiddleX =[0,0]
             tempMiddleY =[0,0]
@@ -285,6 +285,8 @@ class FindTrack(FindObject):
                 self.Middle.update(self.imgSize[1]/2,0,float("inf"))
         else:
             # if there are no lines,middle line is set to middle of the img
+            self.leftLines = None
+            self.rightLines= None
             self.Middle.update(self.imgSize[1]/2,0,float("inf"))
         if self.debugFlag is True:
             cv2.imshow("canny",self.edges)   

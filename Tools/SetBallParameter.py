@@ -28,7 +28,10 @@ valueRange=[[0,255],[0,255],[0,255],\
             [60,1000],[1000,5000],
             #DilateKsize
             [3,15]]
-
+#Flags
+FirstFlag = False
+UseCamFlag= True
+#Flags
 #parameter get
 configFile = ".//Config//BallConfig.txt"
 paraGet    = Parameter(configFile=configFile)

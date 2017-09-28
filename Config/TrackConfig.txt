@@ -1,0 +1,12 @@
+Hmin:70
+Smin:70
+Vmin:0
+Hmax:255
+Smax:255
+Vmax:255
+Threshold:25
+BlurSize:15
+CannyRang:100
+LinePointCount:60
+MinLineLength:120
+maxLineGap:10
