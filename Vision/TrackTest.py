@@ -13,7 +13,7 @@ barBinary.creatTrackbar(['threshold:'],[(0,255)])
 
 img = cv2.imread(".\\Vision\\picture\\track5.jpg")
 cv2.imshow('ORIGIN', img)
-track = FindTrack(img,debugFlag = False)
+track = FindTrack(img,debugFlag = True)
 while True :
     color = trackbar.getTrackbarValue()
     threshold = barBinary.getTrackbarValue()

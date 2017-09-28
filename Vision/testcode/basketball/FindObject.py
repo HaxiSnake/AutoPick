@@ -33,7 +33,7 @@ class FindObject:
         self.hsvmask = None
         self.binary  = None
         self.debugFlag = debugFlag
-        print ("A FindObject Class is created!")
+        #print ("A FindObject Class is created!")
     def updateImg(self,img):
         '''update img
             input:img
@@ -109,8 +109,7 @@ class FindObject:
         pass
 
 class FindBall(FindObject):
-    '''find  ball '''
-    def getCenter(self,binaryImg=None,contoursRange=(60,1000),dilateFlag=True, ksize=(3,3)):
+    def getCenter(self,binaryImg=None,contoursRange=(200,1000),dilateFlag=True, ksize=(3,3)):
         '''Get the center the of the ball
         input : binaryImg,contoursRange=(200,1000)
         return: coutours,img
@@ -189,8 +188,6 @@ class FindBall(FindObject):
                 cv2.circle(self.drawImg, (self.CenterP[i][0], self.CenterP[i][1]), int(math.sqrt(area/math.pi)), _white, 0)
                 i = i + 1
             cv2.imshow("Redball",self.drawImg)
-        else:
-            cv2.imshow("Redball",self.img)
 
 class FindTrack(FindObject):
     def __init__(self,img,debugFlag=False):

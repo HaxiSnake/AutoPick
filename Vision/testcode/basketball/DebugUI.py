@@ -14,7 +14,7 @@ class TrackBar():
     def nothing(self,test):
         'A function to be the parameter of cv2.createTrackbar '
         pass
-    def creatTrackbar(self,nameList = ['Temp'],valueRange = [[0,255]]):
+    def creatTrackbar(self,nameList = ['Temp'],valueRange = [(0,255)]):
         'Creat Trackbar'
         self.nameList = nameList
         self.valueRange = valueRange
