@@ -4,7 +4,7 @@ Vmin:0
 Hmax:26
 Smax:255
 Vmax:255
-Threshold:60
+Threshold:92
 ContorMin:145
 ContorMax:1441
 DilateKsize:4

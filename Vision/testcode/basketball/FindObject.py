@@ -32,6 +32,7 @@ class FindObject:
         self.img     = img
         self.hsvmask = None
         self.binary  = None
+        self.dilateImg = None
         self.debugFlag = debugFlag
         #print ("A FindObject Class is created!")
     def updateImg(self,img):

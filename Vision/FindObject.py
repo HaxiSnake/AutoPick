@@ -197,6 +197,8 @@ class FindTrack(FindObject):
         self.img     = img
         self.hsvmask = None
         self.binary  = None
+        self.blurtImg= None
+        self.edges   = None
         self.debugFlag = debugFlag
         self.imgSize = img.shape
         self.Middle = Line(self.imgSize[1]/2,0,float("inf"))
@@ -322,9 +324,45 @@ class FindTrack(FindObject):
         (int(self.Middle.getX(self.imgSize[0])),self.imgSize[0]),\
         (0,255,255),3)
         cv2.imshow("FindTrack",self.lineTemp)
-        
-
-
-
-
-    
+class BallShow:
+    def __init__(self,ball):
+        self.key = ord('q')
+        self.ball = ball
+    def updateBall(self,ball):
+        self.ball = ball
+    def switchWindow(self,key):
+        if key < 256 and key >= 0:
+            if  chr(key) in "qwer":
+                self.key = key
+    def showImg(self):
+        if   self.key == ord('q'):
+            cv2.imshow("process",self.ball.hsvmask)
+        elif self.key == ord('w'):
+            cv2.imshow("process",self.ball.binary)
+        elif self.key == ord('e'):
+            cv2.imshow("process",self.ball.dilateImg)
+        elif self.key == ord('r'):
+            cv2.imshow("process",self.ball.img)
+        else:
+            pass
+class TrackShow:
+    def __init__(self,track):
+        self.key = ord('q')
+        self.track = track
+    def updateBall(self,ball):
+        self.track = track
+    def switchWindow(self,key):
+        if key < 256 and key >= 0:
+            if  chr(key) in "qwer":
+                self.key = key
+    def showImg(self):
+        if   self.key == ord('q'):
+            cv2.imshow("process",self.track.hsvmask)
+        elif self.key == ord('w'):
+            cv2.imshow("process",self.track.binary)
+        elif self.key == ord('e'):
+            cv2.imshow("process",self.track.blurtImg)
+        elif self.key == ord('r'):
+            cv2.imshow("process",self.track.edges)
+        else:
+            pass    

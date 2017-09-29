@@ -7,6 +7,11 @@ sys.path.append(os.getcwd())
 from Vision.FindObject import * 
 from Vision.DebugUI import *
 from Tools.ParaSave import *
+#Flags
+FirstFlag = False
+UseCamFlag= True
+Scale     = 0.5
+#Flags
 #paraList
             #lower_color
 nameList = ['Hmin',"Smin","Vmin",\
@@ -41,10 +46,7 @@ valueRange=[[70,255],[70,255],[0,255],\
             #maxLineGap
             [10,500]]
 #paraList
-#Flags
-FirstFlag = False
-UseCamFlag= True
-#Flags
+
 #parameter get
 configFile = ".//Config//TrackConfig.txt"
 if FirstFlag is not True:
@@ -65,6 +67,7 @@ originImg = None
 img = None
 cap = None
 track = None
+debugShow = None
 if UseCamFlag is True:
     cap = cv2.VideoCapture(0)
     ret,originImg = cap.read()
@@ -73,7 +76,8 @@ else:
     ret = True
 if ret is True:
     img = cv2.resize(originImg,None,fx=0.5,fy=0.5,interpolation=cv2.INTER_AREA)
-    track = FindTrack(img,debugFlag = True)
+    track = FindTrack(img,debugFlag = False)
+    debugShow = TrackShow(track)
 else :
     print("can not open camera!")
     exit()
@@ -91,7 +95,7 @@ maxLineGap      :para[11]
 
 '''
 while ret is True :
-    cv2.imshow('ORIGIN', originImg)
+    #cv2.imshow('ORIGIN', originImg)
     img = cv2.resize(originImg,None,fx=0.5,fy=0.5,interpolation=cv2.INTER_AREA)
     cv2.imshow('resize', img)
     track.updateImg(img)
@@ -116,6 +120,13 @@ while ret is True :
         paraSave = Parameter(para,nameList,configFile)
         paraSave.WriteConfig()
         print "Save Parameter Done!"
+    else:
+        debugShow.switchWindow(key)
+        #q:hsv
+        #w:binary
+        #e:blurt
+        #r:edge
+    debugShow.showImg()
     #save or exit
     #get image
     if UseCamFlag is True:

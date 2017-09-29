@@ -7,6 +7,11 @@ sys.path.append(os.getcwd())
 from Vision.FindObject import * 
 from Vision.DebugUI import *
 from Tools.ParaSave import *
+#Flags
+FirstFlag = False
+UseCamFlag= True
+Scale     = 0.5
+#Flags
 #paraList
             #lower_color
 nameList = ['Hmin',"Smin","Vmin",\
@@ -28,10 +33,7 @@ valueRange=[[0,255],[0,255],[0,255],\
             [60,1000],[1000,5000],
             #DilateKsize
             [3,15]]
-#Flags
-FirstFlag = False
-UseCamFlag= True
-#Flags
+
 #parameter get
 configFile = ".//Config//BallConfig.txt"
 if FirstFlag is not True:
@@ -48,6 +50,7 @@ ret = False
 originImg = None
 cap = None
 ball= None
+debugShow = None
 if UseCamFlag is True:
     cap = cv2.VideoCapture(0)
     ret,originImg = cap.read()
@@ -55,8 +58,9 @@ else:
     originImg = cv2.imread(".\\vision\\picture\\redball.jpg")
     ret=True
 if ret is True:
-    img = cv2.resize(originImg,None,fx=0.5,fy=0.5,interpolation=cv2.INTER_AREA)
-    ball = FindBall(img,debugFlag = True)
+    img = cv2.resize(originImg,None,fx=Scale,fy=Scale,interpolation=cv2.INTER_AREA)
+    ball = FindBall(img,debugFlag = False)
+    debugShow = BallShow(ball)
 else:
     print("can not open camera!")
     exit()
@@ -69,8 +73,8 @@ ContorSize :para[7:9]
 DilateKsize:para[9]
 '''
 while ret is True :
-    cv2.imshow('ORIGIN', originImg)
-    img = cv2.resize(originImg,None,fx=0.5,fy=0.5,interpolation=cv2.INTER_AREA)
+    #cv2.imshow('ORIGIN', originImg)
+    img = cv2.resize(originImg,None,fx=Scale,fy=Scale,interpolation=cv2.INTER_AREA)
     cv2.imshow('resize', img)
     ball.updateImg(img)
     #get parameter
@@ -91,6 +95,13 @@ while ret is True :
         paraSave = Parameter(para,nameList,configFile)
         paraSave.WriteConfig()
         print "Save Parameter Done!"
+    else:
+        debugShow.switchWindow(key)
+        #q:hsv
+        #w:binary
+        #e:dilate
+        #r:img
+    debugShow.showImg()
     #get image
     if UseCamFlag is True:
         ret,originImg = cap.read()
