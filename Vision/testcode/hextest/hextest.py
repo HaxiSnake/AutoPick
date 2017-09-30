@@ -8,7 +8,7 @@ print "hex code:", binascii.a2b_hex(code)
 print "code1:",code1
 
 def setSpeed(speed):
-    ser.serial.Serial('COM1',baudrate=115200,bytesize=8,parity='E',stopbits=1,timeout=1)
+    ser=serial.Serial('COM1',baudrate=115200,bytesize=8,parity='E',stopbits=1,timeout=1)
     head = "AA55060104"
     tail = "000000"
     sendStr = head + speed + tail
