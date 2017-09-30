@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import binascii
 import serial
+import time
 class Kobuki:
     def __init__(self,SerialPort):
-        self.ser = serial.Serial(port=SerialPort, baudrate=115200, bytesize=8, parity=serial.PARITY_EVEN, stopbits=1, timeout=1)
+        self.ser = serial.Serial(SerialPort, baudrate=115200, bytesize=8, parity=serial.PARITY_EVEN, stopbits=1, timeout=1)
         self.speed        = 0
         self.direction    = 0
         self.speedStr     = "0000"
@@ -44,8 +45,17 @@ class Kobuki:
         sendBites = binascii.a2b_hex(self.sendStr)
         if self.ser.isOpen():
             self.ser.write(sendBites)
+    def destorySerial(self):
+        self.ser.close()
 if __name__ == "__main__":
     print "Hello!"
-    kobuki=Kobuki("COM1")
-    kobuki.setSpeed(0x80)
-    kobuki.sendCommand()
+    kobuki=Kobuki('COM5')
+    for i in range(4):
+        kobuki.setSpeed(0x80)
+        kobuki.sendCommand()
+        time.sleep(1)
+        kobuki.setSpeed(0)
+        kobuki.sendCommand()
+        time.sleep(1)
+    kobuki.destorySerial()
+
