@@ -35,8 +35,21 @@ class Kobuki:
         self.speedStr='{:0>4s}'.format(tempStr)
         #反序列化
         self.speedStr= self.speedStr[2:]+self.speedStr[:2]
-    def setDirection(self):
-        pass
+    def setDirection(self,direction):
+        newdirection = None
+        if direction > 32767:
+            direction = 32767
+        if direction < -32767:
+            direction = -32767
+        if direction >= 0:
+            newdirection = direction
+        else:
+            newdirection = 0xffff+direction
+        tempStr = str(hex(newdirection))[2:]
+        #补0
+        self.directionStr='{:0>4s}'.format(tempStr)
+        #反序列化
+        self.directionStr= self.directionStr[2:]+self.directionStr[:2]
     def sendCommand(self):
         self.sendStr = self.head + self.speedStr + self.directionStr
         self.tail = self.checkSum(self.sendStr)
