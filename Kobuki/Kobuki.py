@@ -1,8 +1,9 @@
+# -*- coding: utf-8 -*-
 import binascii
 import serial
 class Kobuki:
     def __init__(self,SerialPort):
-        #self.ser = serial.Serial(port=SerialPort, baudrate=115200, bytesize=8, parity='E', stopbits=1, timeout=1)
+        self.ser = serial.Serial(port=SerialPort, baudrate=115200, bytesize=8, parity=serial.PARITY_EVEN, stopbits=1, timeout=1)
         self.speed        = 0
         self.direction    = 0
         self.speedStr     = "0000"
@@ -19,23 +20,32 @@ class Kobuki:
         for i in range(2,len(Bites)):
             tempBite ^= int(Bites[i])
         return "00" if tempBite else "01"
-    def setSpeed(self):
-        pass
+    def setSpeed(self,speed):
+        newspeed = None
+        if speed > 32767:
+            speed = 32767
+        if speed < -32767:
+            spee = -32767
+        if speed >= 0:
+            newspeed = speed
+        else:
+            newspeed = 0xffff+speed
+        tempStr = str(hex(newspeed))[2:]
+        #补0
+        self.speedStr='{:0>4s}'.format(tempStr)
+        #反序列化
+        self.speedStr= self.speedStr[2:]+self.speedStr[:2]
     def setDirection(self):
         pass
     def sendCommand(self):
-        self.sendStr = self.head + self.speedStr + self.directionStr + self.tail
-        pass
+        self.sendStr = self.head + self.speedStr + self.directionStr
+        self.tail = self.checkSum(self.sendStr)
+        self.sendStr = self.sendStr + self.tail
+        sendBites = binascii.a2b_hex(self.sendStr)
+        if self.ser.isOpen():
+            self.ser.write(sendBites)
 if __name__ == "__main__":
     print "Hello!"
-    a = 1
-    b = 4
-    code = 'AA5506010480000000'
-    print bin(a)
-    print bin(b)
-    print bin(a^b)
-    testCode=binascii.a2b_hex(code)
-    print testCode.encode('hex')
-    kobuki = Kobuki("test")
-    print kobuki.checkSum(code)
-    
+    kobuki=Kobuki("COM1")
+    kobuki.setSpeed(0x80)
+    kobuki.sendCommand()
