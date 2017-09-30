@@ -63,12 +63,12 @@ class Kobuki:
 if __name__ == "__main__":
     print "Hello!"
     kobuki=Kobuki('COM5')
+    direction = 400
     for i in range(4):
-        kobuki.setSpeed(0x80)
+        kobuki.setSpeed(256)
+        kobuki.setDirection(direction)
         kobuki.sendCommand()
-        time.sleep(1)
-        kobuki.setSpeed(0)
-        kobuki.sendCommand()
-        time.sleep(1)
+        direction = direction*-1
+        time.sleep(2)
     kobuki.destorySerial()
 
