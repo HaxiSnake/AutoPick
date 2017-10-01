@@ -7,6 +7,7 @@ class Dobot:
             print("Dobot init failed.")
             exit()
         self.dobotInit()
+        self.isOK = True 
     def waitDobot(self):
         while(True):
             buff = self.ser.read(10)

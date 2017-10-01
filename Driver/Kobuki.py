@@ -15,6 +15,7 @@ class Kobuki:
         if self.ser.isOpen() is not True:
             print("Kobuki init failed.")
             exit()
+        self.isOK = True 
     def checkSum(self,bytesteamStr):
         tempBites = 0
         tempBite  = 0
