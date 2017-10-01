@@ -12,6 +12,9 @@ class Kobuki:
         self.head = "AA55060104"
         self.tail = "00"
         self.sendStr = None
+        if self.ser.isOpen() is not True:
+            print("Kobuki init failed.")
+            exit()
     def checkSum(self,bytesteamStr):
         tempBites = 0
         tempBite  = 0

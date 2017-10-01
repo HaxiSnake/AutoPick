@@ -1,0 +1,42 @@
+import serial
+import time
+class Dobot:
+    def __init__(self,SerialPort):
+        self.ser = serial.Serial(SerialPort, baudrate=115200,timeout=1)
+        if self.ser.isOpen() is not True:
+            print("Dobot init failed.")
+            exit()
+        self.dobotInit()
+    def waitDobot(self):
+        while(True):
+            buff = self.ser.read(10)
+            if ("ok" in buff):
+                break
+            time.sleep(0.01)
+    def dobotInit(self):
+        print "dobot Init start"
+        self.ser.write("G28 X0 Y0 Z0\n")
+        self.waitDobot()
+        self.ser.write("G91\n")
+        self.waitDobot()
+        print "dobot Init done!"
+    def pickHigh(self):
+        print "dobot pick high start"
+        self.ser.write("G1 X140 F9999\n")
+        self.ser.write("G1 Z-40 F9999\n")
+        self.ser.write("G28 Y0 Z0\n")
+        self.waitDobot()
+        print "dobot pick high done!"
+    def pickLow(self):
+        print "dobot pick low start"
+        self.ser.write("G1 X140 F9999\n")
+        self.ser.write("G1 Z-240 F9999\n")
+        self.ser.write("G28 Y0 Z0\n")
+        self.waitDobot()
+        print "dobot pick low done!"
+if __name__ == "__main__":
+    print "Hello!I am Dobot!"
+    dobot=Dobot('COM4')
+    dobot.pickHigh()
+    dobot.pickLow()
+
