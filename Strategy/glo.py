@@ -3,7 +3,7 @@ KOBUKI_COM   = "COM5"
 DOBOT_COM    = "COM4"
 BALL_CONFIG  = ".\\Config\\BallConfig.txt"
 TRACK_CONFIG = ".\\Config\\TrackConfig.txt"
-IMG_SCALE    = 0.5#readonly
+DEBUG_FLAG   = True
 
 #global flags
 class PID:
@@ -23,13 +23,10 @@ class PID:
         return self.Out
 
 #variable
-TheTrackImg  = None
-TheBallImg   = None
-TheTrackPara = None
-TheBallPara  = None
+TheTrackDelta = None
+TheThreadLock = None
+TheTrackThread = None
 #class
 TheDirection = None
 TheKobuki    = None
 TheDobot     = None
-TheBallCam   = None
-TheTrackCam  = None

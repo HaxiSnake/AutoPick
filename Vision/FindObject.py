@@ -324,6 +324,15 @@ class FindTrack(FindObject):
         (int(self.Middle.getX(self.imgSize[0])),self.imgSize[0]),\
         (0,255,255),3)
         cv2.imshow("FindTrack",self.lineTemp)
+    def getDelta(self,default=True,prospect=0,target=0):
+        if default is True:
+            self.prospect = self.imgSize[0]*2.0/3
+            self.target   = self.imgSize[1]/2.0
+        else:
+            self.prospect = prospect
+            self.target   = target
+        return int(self.target-self.Middle.getX(self.prospect))
+
 class BallShow:
     def __init__(self,ball):
         self.key = ord('q')

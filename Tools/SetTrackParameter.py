@@ -2,7 +2,8 @@ import cv2
 import numpy
 import os
 import sys
-os.chdir("G:\\AutoPick")
+workdir = "G:\\AutoPickRobot\\AutoPick"
+os.chdir(workdir)
 sys.path.append(os.getcwd())
 from Vision.FindObject import * 
 from Vision.DebugUI import *
@@ -10,7 +11,6 @@ from Tools.ParaSave import *
 #Flags
 FirstFlag = False
 UseCamFlag= True
-Scale     = 0.5
 #Flags
 #paraList
             #lower_color
@@ -48,7 +48,7 @@ valueRange=[[70,255],[70,255],[0,255],\
 #paraList
 
 #parameter get
-configFile = ".//Config//TrackConfig.txt"
+configFile = ".\\Config\\TrackConfig.txt"
 if FirstFlag is not True:
     paraGet    = Parameter(configFile=configFile)
     nameList,paraList = paraGet.ReadConfig()
@@ -70,12 +70,14 @@ track = None
 debugShow = None
 if UseCamFlag is True:
     cap = cv2.VideoCapture(0)
-    ret,originImg = cap.read()
+    ret,img = cap.read()
+    #cap.set(cv2.CAP_PROP_FRAME_WIDTH,180)
+    #cap.set(cv2.CAP_PROP_FRAME_HEIGHT,320)
 else:
-    originImg = cv2.imread(".\\vision\\picture\\track5.jpg")
+    img = cv2.imread(".\\vision\\picture\\track5.jpg")
     ret = True
 if ret is True:
-    img = cv2.resize(originImg,None,fx=0.5,fy=0.5,interpolation=cv2.INTER_AREA)
+    #img = cv2.resize(originImg,None,fx=0.5,fy=0.5,interpolation=cv2.INTER_AREA)
     track = FindTrack(img,debugFlag = False)
     debugShow = TrackShow(track)
 else :
@@ -96,8 +98,8 @@ maxLineGap      :para[11]
 '''
 while ret is True :
     #cv2.imshow('ORIGIN', originImg)
-    img = cv2.resize(originImg,None,fx=0.5,fy=0.5,interpolation=cv2.INTER_AREA)
-    cv2.imshow('resize', img)
+    #img = cv2.resize(originImg,None,fx=0.5,fy=0.5,interpolation=cv2.INTER_AREA)
+    cv2.imshow('origin', img)
     track.updateImg(img)
     #get parameter
     para = trackbar.getTrackbarValue()
@@ -130,9 +132,9 @@ while ret is True :
     #save or exit
     #get image
     if UseCamFlag is True:
-        ret,originImg = cap.read()
+        ret,img = cap.read()
     else:
-        originImg = cv2.imread(".\\vision\\picture\\track5.jpg")
+        img = cv2.imread(".\\vision\\picture\\track5.jpg")
         ret = True
     #get image
     #while ret is True end
