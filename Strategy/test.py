@@ -3,7 +3,8 @@ import sys
 import cv2
 import time
 import threading
-workdir = "G:\\AutoPickRobot\\AutoPick"
+#workdir = "G:\\AutoPickRobot\\AutoPick"
+workdir = "E:\\WORKSPACE\\2_Haobbys\\AutoPickRobot\\AutoPick"
 os.chdir(workdir)
 sys.path.append(os.getcwd())
 from Driver.Kobuki     import *
@@ -114,7 +115,7 @@ if __name__ == "__main__":
         print "delta:",glo.TheTrackDelta
         time.sleep(0.020)
         count += 1
-        if count > 500:
+        if count > 1000:
             break
     glo.MAIN_STOP_FLAG = True
     exit()
