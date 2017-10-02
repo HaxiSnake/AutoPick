@@ -2,7 +2,8 @@ import cv2
 import numpy
 import os
 import sys
-workdir = "G:\\AutoPickRobot\\AutoPick"
+#workdir = "G:\\AutoPickRobot\\AutoPick"
+workdir = "E:\\WORKSPACE\\2_Haobbys\\AutoPickRobot\\AutoPick"
 os.chdir(workdir)
 sys.path.append(os.getcwd())
 from Vision.FindObject import * 
@@ -11,6 +12,8 @@ from Tools.ParaSave import *
 #Flags
 FirstFlag = False
 UseCamFlag= True
+CAMID = 1
+
 #Flags
 #paraList
             #lower_color
@@ -69,7 +72,7 @@ cap = None
 track = None
 debugShow = None
 if UseCamFlag is True:
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(CAMID)
     ret,img = cap.read()
     #cap.set(cv2.CAP_PROP_FRAME_WIDTH,180)
     #cap.set(cv2.CAP_PROP_FRAME_HEIGHT,320)

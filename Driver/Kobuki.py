@@ -42,6 +42,7 @@ class Kobuki:
         self.speedStr= self.speedStr[2:]+self.speedStr[:2]
     def setDirection(self,direction):
         newdirection = None
+        direction = int(direction)
         if direction > 32767:
             direction = 32767
         if direction < -32767:

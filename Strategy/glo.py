@@ -1,6 +1,7 @@
 #global flags
 KOBUKI_COM   = "COM5"
 DOBOT_COM    = "COM4"
+TRACK_CAM    = 1
 BALL_CONFIG  = ".\\Config\\BallConfig.txt"
 TRACK_CONFIG = ".\\Config\\TrackConfig.txt"
 DEBUG_FLAG   = True
@@ -17,13 +18,13 @@ class PID:
         self.Out = 0.0
     def control(self,delta):
         self.deltaNow = delta
-        self.errI += self.deltaNow
+        self.errI = self.errI + self.deltaNow
         self.Out = self.P * (self.deltaNow) + self.I*self.errI + self.D * (self.deltaNow -self.deltaOld)
         self.deltaOld = self.deltaNow
         return self.Out
 
 #variable
-TheTrackDelta = None
+TheTrackDelta = 0.0
 TheThreadLock = None
 TheTrackThread = None
 #class

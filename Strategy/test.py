@@ -16,13 +16,13 @@ import glo
 def systemInit():
     glo.TheKobuki     = Kobuki(glo.KOBUKI_COM)
     #glo.TheDobot     = Dobot(glo.DOBOT_COM)
-    glo.TheDirection  = glo.PID(P=1.0,D=0.0) 
+    glo.TheDirection  = glo.PID(P=0.01,D=0.0) 
     glo.TheThreadLock = threading.Lock()
     glo.TheTrackThread= TrackThread(1,"Track",1)
     glo.TheTrackThread.start()
 def KobukiControl():
     glo.TheKobuki.setSpeed(0x80)
-    glo.TheKobuki.setDirection(glo.TheTrackDelta)
+    glo.TheKobuki.setDirection(glo.TheDirection.control(glo.TheTrackDelta))
     glo.TheKobuki.sendCommand()
 def grub():
     pass
@@ -35,7 +35,7 @@ class TrackThread(threading.Thread):
         self.img      = None
         self.track    = None
         #open and set capture
-        self.trackCam = cv2.VideoCapture(0)
+        self.trackCam = cv2.VideoCapture(glo.  TRACK_CAM)
         if self.trackCam.isOpened() is False:
             print "Can not open trackCam!"
             self.trackCam.release()
@@ -115,7 +115,7 @@ if __name__ == "__main__":
         print "delta:",glo.TheTrackDelta
         time.sleep(0.020)
         count += 1
-        if count > 1000:
+        if count > 500:
             break
     glo.MAIN_STOP_FLAG = True
     exit()
