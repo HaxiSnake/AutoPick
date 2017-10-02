@@ -4,7 +4,7 @@ DOBOT_COM    = "COM4"
 BALL_CONFIG  = ".\\Config\\BallConfig.txt"
 TRACK_CONFIG = ".\\Config\\TrackConfig.txt"
 DEBUG_FLAG   = True
-
+MAIN_STOP_FLAG = False
 #global flags
 class PID:
     def __init__(self,P=1.0,I=0.0,D=0.0):
