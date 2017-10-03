@@ -33,6 +33,7 @@ class FindObject:
         self.hsvmask = None
         self.binary  = None
         self.debugFlag = debugFlag
+        self.imgSize = img.shape
         print ("A FindObject Class is created!")
     def updateImg(self,img):
         '''update img
@@ -176,10 +177,10 @@ class FindBall(FindObject):
                 self.CenterP = numpy.asarray(self.CenterP)
                 return self.contours,self.CenterP
 
-    def draw(self):
+    def draw(self,calFlag = False):
         _white =  (255, 255, 255)
+        self.drawImg = self.img.copy()
         if len(self.contours) > 0 and len(self.contours) == len(self.CenterP):
-            self.drawImg = self.img.copy()
             #cv2.drawContours(self.drawImg,self.contours,-1,_white,5)
             i=0
             count = len(self.CenterP)
@@ -188,9 +189,41 @@ class FindBall(FindObject):
                 area = math.fabs(cv2.contourArea(self.contours[i]))
                 cv2.circle(self.drawImg, (self.CenterP[i][0], self.CenterP[i][1]), int(math.sqrt(area/math.pi)), _white, 0)
                 i = i + 1
+            if calFlag is True:
+                 cv2.line(self.drawImg,(self.PickPosition,0),(self.PickPosition,self.imgSize[0]),(255,255,0),3)
+                 cv2.line(self.drawImg,(0,self.Height),(self.imgSize[1],self.Height),(255,255,0),3)
             cv2.imshow("Redball",self.drawImg)
         else:
-            cv2.imshow("Redball",self.img)
+            if calFlag is True:
+                 cv2.line(self.drawImg,(self.PickPosition,0),(self.PickPosition,self.imgSize[0]),(255,255,0),3)
+                 cv2.line(self.drawImg,(0,self.Height),(self.imgSize[1],self.Height),(255,255,0),3)
+            cv2.imshow("Redball",self.drawImg)
+    def calculate(self,PickPosition,Height):
+        self.PickPosition = PickPosition
+        self.Height       = Height
+        if self.PickPosition < 0 or self.PickPosition > self.imgSize[1]:
+            self.PickPosition = int(self.imgSize[0]/10)
+        if self.Height < 0 or self.Height > self.imgSize[0]:
+            self.Height = int(self.imgSize[0]/2.0)
+        if len(self.contours) > 0 and len(self.contours) == len(self.CenterP):
+            if len(self.CenterP) == 1:
+                distance = self.CenterP[0][0] - self.PickPosition
+                highFlag = None
+                if self.Height > self.CenterP[0][1]:
+                    highFlag = True
+                else:
+                    highFlag = False
+                return int(distance),highFlag
+            else:
+                distance = self.CenterP[0][0] - self.PickPosition
+                highFlag = None
+                if self.Height > self.CenterP[0][1]:
+                    highFlag = True
+                else:
+                    highFlag = False
+                return int(distance),highFlag
+        else:
+            return None,None
 
 class FindTrack(FindObject):
     def __init__(self,img,debugFlag=False):

@@ -2,7 +2,8 @@ import cv2
 import numpy
 import os
 import sys
-os.chdir("G:\\AutoPick")
+workdir = "G:\\AutoPickRobot\\AutoPick"
+os.chdir(workdir)
 sys.path.append(os.getcwd())
 from Vision.FindObject import * 
 from Vision.DebugUI import *
@@ -79,9 +80,6 @@ while ret is True :
     ball.updateImg(img)
     #get parameter
     para = trackbar.getTrackbarValue()
-    #special process for blur size
-    if para[7]%2 == 0:
-        para[7]=para[7]+1
     #img process    
     ball.hsvFilter(tuple(para[0:3]),tuple(para[3:6]))
     ball.converToBinary(para[6])

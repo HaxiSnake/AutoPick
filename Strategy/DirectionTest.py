@@ -16,7 +16,7 @@ import glo
 def systemInit():
     glo.TheKobuki     = Kobuki(glo.KOBUKI_COM)
     #glo.TheDobot     = Dobot(glo.DOBOT_COM)
-    glo.TheDirection  = glo.PID(P=0.01,D=0.0) 
+    glo.TheDirection  = glo.PID(P=glo.TRACK_P,D=glo.TRACK_D) 
     glo.TheThreadLock = threading.Lock()
     glo.TheTrackThread= TrackThread(1,"Track",1)
     glo.TheTrackThread.start()
