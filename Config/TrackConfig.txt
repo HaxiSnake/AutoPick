@@ -7,6 +7,6 @@ Vmax:255
 Threshold:25
 BlurSize:15
 CannyRang:100
-LinePointCount:60
+LinePointCount:30
 MinLineLength:120
-maxLineGap:10
+maxLineGap:5

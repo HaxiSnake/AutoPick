@@ -3,7 +3,8 @@ import sys
 import cv2
 import time
 import threading
-workdir = "G:\\AutoPickRobot\\AutoPick"
+#workdir = "G:\\AutoPickRobot\\AutoPick"
+workdir = "/home/pi/AutoPick"
 #workdir = "E:\\WORKSPACE\\2_Haobbys\\AutoPickRobot\\AutoPick"
 os.chdir(workdir)
 sys.path.append(os.getcwd())
@@ -46,6 +47,7 @@ class TrackThread(threading.Thread):
         self.name     = name
         self.counter  = counter
         self.img      = None
+        self.imgOrigin= None
         self.track    = None
         #open and set capture
         self.trackCam = cv2.VideoCapture(glo.TRACK_CAM)
@@ -56,8 +58,9 @@ class TrackThread(threading.Thread):
         #self.trackCam.set(cv2.CAP_PROP_FRAME_WIDTH,180)
         #self.trackCam.set(cv2.CAP_PROP_FRAME_HEIGHT,320)
         ret = None
-        ret,self.img =self.trackCam.read()
+        ret,self.imgOrigin =self.trackCam.read()
         if ret is True:
+            self.img = cv2.resize(self.imgOrigin, None, fx=glo.IMG_SCALE,fy=glo.IMG_SCALE, interpolation=cv2.INTER_AREA)
             self.track = FindTrack(self.img,debugFlag=False)
         else:
             print "Can not get track img!"
@@ -75,8 +78,9 @@ class TrackThread(threading.Thread):
         print self.Para
         #read para
     def run(self):
-        ret,self.img = self.trackCam.read()
+        ret, self.imgOrigin = self.trackCam.read()
         while ret is True:
+            self.img = cv2.resize(self.imgOrigin, None, fx=glo.IMG_SCALE,fy=glo.IMG_SCALE, interpolation=cv2.INTER_AREA)
             tempDelta = processTrackImg(self.img,self.track,self.Para)
             #cv2.imshow("img",self.img)
             key = cv2.waitKey(1)
@@ -85,7 +89,7 @@ class TrackThread(threading.Thread):
             glo.TheThreadLock.acquire()
             glo.TheTrackDelta = tempDelta
             glo.TheThreadLock.release()
-            ret,self.img = self.trackCam.read()
+            ret, self.imgOrigin = self.trackCam.read()
             if glo.MAIN_STOP_FLAG is True:
                 self.exitThread()
                 print "Track thread stop"
@@ -125,6 +129,7 @@ class BallThread(threading.Thread):
         self.name     = name
         self.counter  = counter
         self.img      = None
+        self.imgOrigin= None
         self.ball    = None
         #open and set capture
         self.ballCam = cv2.VideoCapture(glo.BALL_CAM)
@@ -135,8 +140,9 @@ class BallThread(threading.Thread):
         #self.ballCam.set(cv2.CAP_PROP_FRAME_WIDTH,180)
         #self.ballCam.set(cv2.CAP_PROP_FRAME_HEIGHT,320)
         ret = None
-        ret,self.img =self.ballCam.read()
+        ret, self.imgOrigin = self.ballCam.read()
         if ret is True:
+            self.img = cv2.resize(self.imgOrigin, None, fx=glo.IMG_SCALE,fy=glo.IMG_SCALE, interpolation=cv2.INTER_AREA)
             self.ball = FindBall(self.img,debugFlag=False)
         else:
             print "Can not get ball img!"
@@ -152,8 +158,9 @@ class BallThread(threading.Thread):
         print self.Para
         #read para
     def run(self):
-        ret,self.img = self.ballCam.read()
+        ret, self.imgOrigin = self.ballCam.read()
         while ret is True:
+            self.img = cv2.resize(self.imgOrigin, None, fx=glo.IMG_SCALE,fy=glo.IMG_SCALE, interpolation=cv2.INTER_AREA)
             processBallImg(self.img,self.ball,self.Para)
             if glo.TheHighFlag is not None and glo.TheDistance is not None:
                 print "Distance:",glo.TheDistance
@@ -166,7 +173,7 @@ class BallThread(threading.Thread):
             glo.TheThreadLock.acquire()
             #glo.TheTrackDelta = tempDelta
             glo.TheThreadLock.release()
-            ret,self.img = self.ballCam.read()
+            ret, self.imgOrigin = self.ballCam.read()
             if glo.MAIN_STOP_FLAG is True:
                 self.exitThread()
                 print "Ball thread stop"
@@ -196,9 +203,10 @@ if __name__ == "__main__":
             if glo.TheDistance < glo.PICK_RANGE :
                 glo.PICK_FLAG = True
         Control()
-        time.sleep(0.020)
+        #time.sleep(0.001)
         count += 1
-        if count > 1000:
+        if count > 100000:
+            #count = 0
             break
     glo.MAIN_STOP_FLAG = False
     exit()

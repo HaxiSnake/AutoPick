@@ -3,7 +3,10 @@ import numpy
 import os
 import sys
 #workdir = "G:\\AutoPickRobot\\AutoPick"
-workdir = "E:\\WORKSPACE\\2_Haobbys\\AutoPickRobot\\AutoPick"
+#workdir = "E:\\WORKSPACE\\2_Haobbys\\AutoPickRobot\\AutoPick"
+workdir  = "/home/pi/AutoPick"
+#configFile = ".\\Config\\TrackConfig.txt"
+configFile = "./Config/TrackConfig.txt"
 os.chdir(workdir)
 sys.path.append(os.getcwd())
 from Vision.FindObject import * 
@@ -51,7 +54,6 @@ valueRange=[[70,255],[70,255],[0,255],\
 #paraList
 
 #parameter get
-configFile = ".\\Config\\TrackConfig.txt"
 if FirstFlag is not True:
     paraGet    = Parameter(configFile=configFile)
     nameList,paraList = paraGet.ReadConfig()
@@ -62,7 +64,7 @@ if FirstFlag is not True:
 if valueRange[7][0]%2 == 0:
     valueRange[7][0]=valueRange[7][0]+1
 #Trackbar 
-trackbar = TrackBar("Parameter",(450,550))
+trackbar = TrackBar("Parameter",(300,50))
 trackbar.creatTrackbar(nameList,valueRange)
 #Trackbar 
 ret = False
@@ -73,14 +75,14 @@ track = None
 debugShow = None
 if UseCamFlag is True:
     cap = cv2.VideoCapture(CAMID)
-    ret,img = cap.read()
+    ret,originImg = cap.read()
     #cap.set(cv2.CAP_PROP_FRAME_WIDTH,180)
     #cap.set(cv2.CAP_PROP_FRAME_HEIGHT,320)
 else:
-    img = cv2.imread(".\\vision\\picture\\track5.jpg")
+    originImg = cv2.imread(".\\vision\\picture\\track5.jpg")
     ret = True
 if ret is True:
-    #img = cv2.resize(originImg,None,fx=0.5,fy=0.5,interpolation=cv2.INTER_AREA)
+    img = cv2.resize(originImg,None,fx=0.5,fy=0.5,interpolation=cv2.INTER_AREA)
     track = FindTrack(img,debugFlag = False)
     debugShow = TrackShow(track)
 else :
@@ -101,8 +103,8 @@ maxLineGap      :para[11]
 '''
 while ret is True :
     #cv2.imshow('ORIGIN', originImg)
-    #img = cv2.resize(originImg,None,fx=0.5,fy=0.5,interpolation=cv2.INTER_AREA)
-    cv2.imshow('origin', img)
+    img = cv2.resize(originImg,None,fx=0.5,fy=0.5,interpolation=cv2.INTER_AREA)
+    #cv2.imshow('origin', img)
     track.updateImg(img)
     #get parameter
     para = trackbar.getTrackbarValue()
@@ -135,9 +137,9 @@ while ret is True :
     #save or exit
     #get image
     if UseCamFlag is True:
-        ret,img = cap.read()
+        ret,originImg = cap.read()
     else:
-        img = cv2.imread(".\\vision\\picture\\track5.jpg")
+        originImg = cv2.imread(".\\vision\\picture\\track5.jpg")
         ret = True
     #get image
     #while ret is True end

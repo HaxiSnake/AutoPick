@@ -2,7 +2,10 @@ import cv2
 import numpy
 import os
 import sys
-workdir = "G:\\AutoPickRobot\\AutoPick"
+#workdir = "E:\\WORKSPACE\\2_Haobbys\\AutoPickRobot\\AutoPick"
+#workdir = "G:\\AutoPickRobot\\AutoPick"
+workdir = "/home/pi/AutoPick"
+configFile = "./Config/BallConfig.txt"
 os.chdir(workdir)
 sys.path.append(os.getcwd())
 from Vision.FindObject import * 
@@ -11,6 +14,7 @@ from Tools.ParaSave import *
 #Flags
 FirstFlag = False
 UseCamFlag= True
+CAMID  = 0
 Scale     = 0.5
 #Flags
 #paraList
@@ -36,7 +40,6 @@ valueRange=[[0,255],[0,255],[0,255],\
             [3,15]]
 
 #parameter get
-configFile = ".//Config//BallConfig.txt"
 if FirstFlag is not True:
     paraGet    = Parameter(configFile=configFile)
     nameList,paraList = paraGet.ReadConfig()
@@ -53,10 +56,10 @@ cap = None
 ball= None
 debugShow = None
 if UseCamFlag is True:
-    cap = cv2.VideoCapture(0)
-    ret,originImg = cap.read()
+    cap = cv2.VideoCapture(CAMID)
+    ret, originImg = cap.read()
 else:
-    originImg = cv2.imread(".\\vision\\picture\\redball.jpg")
+    img = cv2.imread(".\\vision\\picture\\redball.jpg")
     ret=True
 if ret is True:
     img = cv2.resize(originImg,None,fx=Scale,fy=Scale,interpolation=cv2.INTER_AREA)
@@ -76,7 +79,7 @@ DilateKsize:para[9]
 while ret is True :
     #cv2.imshow('ORIGIN', originImg)
     img = cv2.resize(originImg,None,fx=Scale,fy=Scale,interpolation=cv2.INTER_AREA)
-    cv2.imshow('resize', img)
+    #cv2.imshow('resize', img)
     ball.updateImg(img)
     #get parameter
     para = trackbar.getTrackbarValue()
@@ -102,10 +105,11 @@ while ret is True :
     debugShow.showImg()
     #get image
     if UseCamFlag is True:
-        ret,originImg = cap.read()
+        ret, originImg = cap.read()
     else:
         originImg = cv2.imread(".\\vision\\picture\\redball.jpg")
         ret = True
     #get image
     #while ret is True end
+cap.release()
 cv2.destroyAllWindows()

@@ -4,7 +4,8 @@ import cv2
 import time
 import threading
 #workdir = "G:\\AutoPickRobot\\AutoPick"
-workdir = "E:\\WORKSPACE\\2_Haobbys\\AutoPickRobot\\AutoPick"
+workdir = "/home/pi/AutoPick"
+#workdir = "E:\\WORKSPACE\\2_Haobbys\\AutoPickRobot\\AutoPick"
 os.chdir(workdir)
 sys.path.append(os.getcwd())
 from Driver.Kobuki     import *
@@ -21,8 +22,13 @@ def systemInit():
     glo.TheTrackThread= TrackThread(1,"Track",1)
     glo.TheTrackThread.start()
 def KobukiControl():
-    glo.TheKobuki.setSpeed(0x80)
-    glo.TheKobuki.setDirection(glo.TheDirection.control(glo.TheTrackDelta))
+    glo.TheKobuki.setSpeed(glo.KOBUKI_SPEED)
+    if glo.TheTrackDelta == 0:
+        glo.TheTrackDelta = 1
+    temp = glo.TheDirection.control(1.0/glo.TheTrackDelta)
+    print "Direction:",temp
+    glo.TheKobuki.setDirection(temp)
+    
     glo.TheKobuki.sendCommand()
 def grub():
     pass
@@ -33,6 +39,7 @@ class TrackThread(threading.Thread):
         self.name     = name
         self.counter  = counter
         self.img      = None
+        self.imgOrigin= None
         self.track    = None
         #open and set capture
         self.trackCam = cv2.VideoCapture(glo.  TRACK_CAM)
@@ -43,8 +50,9 @@ class TrackThread(threading.Thread):
         #self.trackCam.set(cv2.CAP_PROP_FRAME_WIDTH,180)
         #self.trackCam.set(cv2.CAP_PROP_FRAME_HEIGHT,320)
         ret = None
-        ret,self.img =self.trackCam.read()
+        ret, self.imgOrigin = self.trackCam.read()
         if ret is True:
+            self.img = cv2.resize(self.imgOrigin, None, fx=glo.IMG_SCALE,fy=glo.IMG_SCALE, interpolation=cv2.INTER_AREA)
             self.track = FindTrack(self.img,debugFlag=False)
         else:
             print "Can not get track img!"
@@ -62,8 +70,9 @@ class TrackThread(threading.Thread):
         print self.Para
         #read para
     def run(self):
-        ret,self.img = self.trackCam.read()
+        ret, self.imgOrigin = self.trackCam.read()
         while ret is True:
+            self.img = cv2.resize(self.imgOrigin, None, fx=glo.IMG_SCALE,fy=glo.IMG_SCALE, interpolation=cv2.INTER_AREA)
             tempDelta = processTrackImg(self.img,self.track,self.Para)
             #cv2.imshow("img",self.img)
             key = cv2.waitKey(1)
@@ -72,7 +81,7 @@ class TrackThread(threading.Thread):
             glo.TheThreadLock.acquire()
             glo.TheTrackDelta = tempDelta
             glo.TheThreadLock.release()
-            ret,self.img = self.trackCam.read()
+            ret,self.imgOrigin = self.trackCam.read()
             if glo.MAIN_STOP_FLAG is True:
                 self.exitThread()
                 print "track thread stop"
@@ -115,7 +124,7 @@ if __name__ == "__main__":
         print "delta:",glo.TheTrackDelta
         time.sleep(0.020)
         count += 1
-        if count > 500:
+        if count > 800:
             break
     glo.MAIN_STOP_FLAG = True
     exit()

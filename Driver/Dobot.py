@@ -37,7 +37,7 @@ class Dobot:
         print "dobot pick low done!"
 if __name__ == "__main__":
     print "Hello!I am Dobot!"
-    dobot=Dobot('COM4')
+    dobot=Dobot('/dev/ttyUSB1')
     dobot.pickHigh()
     dobot.pickLow()
 
