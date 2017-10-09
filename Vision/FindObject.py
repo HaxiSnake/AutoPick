@@ -215,9 +215,16 @@ class FindBall(FindObject):
                     highFlag = False
                 return int(distance),highFlag
             else:
-                distance = self.CenterP[0][0] - self.PickPosition
+                minID = 0
+                minDistanceAbs = self.imgSize[0]
+                for i in range(len(self.CenterP)):
+                    distance = self.CenterP[i][0] - self.PickPosition
+                    if abs(distance) < minDistanceAbs:
+                        minDistanceAbs = abs(distance)
+                        minID = i
+                distance = self.CenterP[minID][0] - self.PickPosition
                 highFlag = None
-                if self.Height > self.CenterP[0][1]:
+                if self.Height > self.CenterP[minID][1]:
                     highFlag = True
                 else:
                     highFlag = False
