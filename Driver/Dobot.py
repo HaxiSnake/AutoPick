@@ -6,11 +6,13 @@ class Dobot:
         if self.ser.isOpen() is not True:
             print("Dobot init failed.")
             exit()
+        #self.ser.read(63)
         self.dobotInit()
         self.isOK = True 
     def waitDobot(self):
         while(True):
-            buff = self.ser.read(10)
+            buff = self.ser.read(63)
+            #print buff
             if ("ok" in buff):
                 break
             time.sleep(0.01)

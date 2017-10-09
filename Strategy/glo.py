@@ -1,6 +1,6 @@
 #global flags
 KOBUKI_COM   = "/dev/ttyUSB0"
-DOBOT_COM    = "COM4"
+DOBOT_COM    = "/dev/ttyUSB1"
 TRACK_CAM    = 1
 BALL_CAM     = 0
 #BALL_CONFIG  = ".\\Config\\BallConfig.txt"
@@ -8,7 +8,7 @@ BALL_CONFIG  = "./Config/BallConfig.txt"
 #TRACK_CONFIG = ".\\Config\\TrackConfig.txt"
 TRACK_CONFIG = "./Config/TrackConfig.txt"
 IMG_SCALE    = 0.5
-MODE_SELECT = 1   #1:TrackTest 2:BallTest 3:TogetherRun
+MODE_SELECT = 3   #1:TrackTest 2:BallTest 3:TogetherRun
 DEBUG_FLAG   = True
 MAIN_STOP_FLAG = False
 PICK_FLAG   = False
@@ -16,8 +16,11 @@ PICK_FLAG   = False
 #variable
 KOBUKI_SPEED = 0x60
 PICK_POSITION= 100
-HEIGHT       = 240
-PICK_RANGE   = 40
+HEIGHT       = 100
+PICK_RANGE_HIGH  = 40
+PICK_RANGE_LOW   = -10
+GRUB_TIME    = 3
+GOSTR_TIME   = 0.8
 TRACK_P      = 15000.0
 TRACK_D      = 10.0
 TheTrackDelta = 0.0
@@ -31,6 +34,7 @@ TheKobuki    = None
 TheDobot     = None
 TheTrackThread = None
 TheBallThread = None
+TheStrategyThread = None
 #class
 class PID:
     def __init__(self,P=1.0,I=0.0,D=0.0):
