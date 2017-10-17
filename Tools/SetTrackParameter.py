@@ -15,7 +15,7 @@ from Tools.ParaSave import *
 #Flags
 FirstFlag = False
 UseCamFlag= True
-CAMID = 1
+CAMID = 0
 
 #Flags
 #paraList

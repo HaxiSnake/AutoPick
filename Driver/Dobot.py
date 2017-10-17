@@ -25,16 +25,18 @@ class Dobot:
         print "dobot Init done!"
     def pickHigh(self):
         print "dobot pick high start"
-        self.ser.write("G1 X140 F9999\n")
-        self.ser.write("G1 Z-40 F9999\n")
-        self.ser.write("G28 Y0 Z0\n")
+        self.ser.write("G1 X60 F9999\n")
+        self.ser.write("G1 Z50 F9999\n")
+        self.ser.write("G1 X65 F9999\n")
+        self.ser.write("G1 Z-120 F9999\n")
+        self.ser.write("G28 Z0\n")
         self.waitDobot()
         print "dobot pick high done!"
     def pickLow(self):
         print "dobot pick low start"
-        self.ser.write("G1 X140 F9999\n")
-        self.ser.write("G1 Z-240 F9999\n")
-        self.ser.write("G28 Y0 Z0\n")
+        self.ser.write("G1 X120 F9999\n")
+        self.ser.write("G1 Z-280 F9999\n")
+        self.ser.write("G28 Z0\n")
         self.waitDobot()
         print "dobot pick low done!"
 if __name__ == "__main__":

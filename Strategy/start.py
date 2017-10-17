@@ -3,6 +3,7 @@ import sys
 import cv2
 import time
 import threading
+import signal
 #workdir = "G:\\AutoPickRobot\\AutoPick"
 workdir = "/home/pi/AutoPick"
 #workdir = "E:\\WORKSPACE\\2_Haobbys\\AutoPickRobot\\AutoPick"
@@ -19,27 +20,33 @@ def systemInit():
     #glo.MODE_SELECT select the workmodel
     #1: TrackTest 2: BallTest 3: TogetherRun
     if glo.MODE_SELECT == 1:
-        glo.TheKobuki      = Kobuki(glo.KOBUKI_COM)
+        glo.TheKobuki = Kobuki(glo.KOBUKI_COM)
         #glo.TheDobot      = Dobot(glo.DOBOT_COM)
-        glo.TheDirection   = glo.PID(P=glo.TRACK_P, D=glo.TRACK_D)
-        glo.TheThreadLock  = threading.Lock()
+        glo.TheDirection = glo.PID(P=glo.TRACK_P, D=glo.TRACK_D)
+        glo.TheThreadLock = threading.Lock()
         glo.TheTrackThread = TrackThread(1, "Track", 1)
         glo.TheTrackThread.start()
+        glo.TheStrategyThread = StrategyThread(3, "Strategy", 3)
+        glo.TheStrategyThread.start()
     elif glo.MODE_SELECT == 2:
         glo.TheKobuki = Kobuki(glo.KOBUKI_COM)
         glo.TheThreadLock = threading.Lock()
         glo.TheBallThread = BallThread(2, "Ball", 2)
         glo.TheBallThread.start()
+        glo.TheStrategyThread = StrategyThread(3, "Strategy", 3)
+        glo.TheStrategyThread.start()
     else:
-        time.sleep(3)
+        time.sleep(1)
         glo.TheKobuki = Kobuki(glo.KOBUKI_COM)
-        glo.TheDobot      = Dobot(glo.DOBOT_COM)
         glo.TheDirection = glo.PID(P=glo.TRACK_P, D=glo.TRACK_D)
         glo.TheThreadLock = threading.Lock()
         glo.TheTrackThread = TrackThread(1, "Track", 1)
         glo.TheTrackThread.start()
         glo.TheBallThread = BallThread(2, "Ball", 2)
         glo.TheBallThread.start()
+        glo.TheDobot = Dobot(glo.DOBOT_COM)
+        glo.TheStrategyThread = StrategyThread(3,"Strategy",3)
+        glo.TheStrategyThread.start()
         time.sleep(0.5)
 
 
@@ -49,10 +56,10 @@ def Control():
     if glo.MODE_SELECT == 1:
         glo.TheKobuki.setSpeed(glo.KOBUKI_SPEED)
         if glo.TheTrackDelta == 0:
-            radius = glo.TheDirection.control(10000)#1.0/0.0001
-        else:  
+            radius = glo.TheDirection.control(10000)  # 1.0/0.0001
+        else:
             radius = glo.TheDirection.control(1.0 / glo.TheTrackDelta)
-        print "Direction:", radius
+        #print "Direction:", radius
         glo.TheKobuki.setDirection(radius)
         glo.TheKobuki.sendCommand()
     elif glo.MODE_SELECT == 2:
@@ -80,8 +87,15 @@ def Control():
             glo.TheKobuki.setDirection(0.0)
             glo.TheKobuki.sendCommand()
             grub(glo.TheHighFlag)
+            glo.TheKobuki.setSpeed(glo.KOBUKI_SPEED)
+            if glo.TheTrackDelta == 0:
+                radius = glo.TheDirection.control(10000)  # 1.0/0.0001
+            else:
+                radius = glo.TheDirection.control(1.0 / glo.TheTrackDelta)
+            glo.TheKobuki.setDirection(radius)
+            glo.TheKobuki.sendCommand()
+            time.sleep(glo.GOSTR_TIME)
             glo.PICK_FLAG = False
-    
 
 
 def grub(HighFlag):
@@ -91,7 +105,7 @@ def grub(HighFlag):
     else:
         print("Pick Low!")
         glo.TheDobot.pickLow()
-    time.sleep(2)
+    time.sleep(glo.GRUB_TIME)
 
 
 class TrackThread(threading.Thread):
@@ -104,7 +118,7 @@ class TrackThread(threading.Thread):
         self.imgOrigin = None
         self.track = None
         #open and set capture
-        self.trackCam = cv2.VideoCapture(glo.TRACK_CAM)  
+        self.trackCam = cv2.VideoCapture(glo.TRACK_CAM)
         i = 0
         while self.trackCam.isOpened() is False:
             self.trackCam.release()
@@ -113,7 +127,7 @@ class TrackThread(threading.Thread):
                 print("Can not open trackCam after 10 times!")
                 self.trackCam.release()
                 exit()
-            i = i+1
+            i = i + 1
         #self.trackCam.set(cv2.CAP_PROP_FRAME_WIDTH,180)
         #self.trackCam.set(cv2.CAP_PROP_FRAME_HEIGHT,320)
         ret = None
@@ -156,8 +170,11 @@ class TrackThread(threading.Thread):
                 print "track thread stop"
                 break
         self.exitThread()
+
     def exitThread(self):
         self.trackCam.release()
+        #print "trackCam release!"
+        exit()
 
 
 def processTrackImg(img, track, para):
@@ -179,11 +196,13 @@ def processTrackImg(img, track, para):
     track.converToBinary(para[6])
     track.getCenter(blurSize=para[7], minVal=para[8], maxVal=para[8] * 3,\
                     linePointCount=para[9], minLineLength=para[10], maxLineGap=para[11],\
-                    slopeThreshold=math.tan(math.pi / 6))
+                    slopeThreshold=math.tan(math.pi / 6),\
+                    defaultPos=int(glo.TRACK_TARGET))
+    tempDelta=track.getDelta(default=False,\
+            prospect=glo.TRACK_PROSPECT,target=glo.TRACK_TARGET)
     if glo.DEBUG_FLAG is True:
-        track.draw()
-    return track.getDelta()
-
+        track.draw(DeltaFlag=True)
+    return tempDelta
 
 class BallThread(threading.Thread):
     def __init__(self, threadID, name, counter):
@@ -231,8 +250,9 @@ class BallThread(threading.Thread):
         ret, self.imgOrigin = self.ballCam.read()
         while ret is True:
             self.img = cv2.resize(self.imgOrigin, None, fx=glo.IMG_SCALE,\
-                        fy=glo.IMG_SCALE, interpolation=cv2.INTER_AREA)
-            tempDistance,tempHighFlag = processBallImg(self.img, self.ball, self.Para)
+                                  fy=glo.IMG_SCALE, interpolation=cv2.INTER_AREA)
+            tempDistance, tempHighFlag = processBallImg(\
+                self.img, self.ball, self.Para)
             key = cv2.waitKey(1)
             if key == 27:
                 break
@@ -240,18 +260,15 @@ class BallThread(threading.Thread):
             glo.TheDistance = tempDistance
             glo.TheHighFlag = tempHighFlag
             glo.TheThreadLock.release()
-            if glo.TheHighFlag is not None and glo.TheDistance is not None:
-                print "Distance:", glo.TheDistance
-                print "HighFlag:", glo.TheHighFlag
-            else:
-                print "IS NONE!"
             ret, self.imgOrigin = self.ballCam.read()
             if glo.MAIN_STOP_FLAG is True:
                 print "Ball thread stop"
                 break
         self.exitThread()
+
     def exitThread(self):
         self.ballCam.release()
+        exit()
 
 
 def processBallImg(img, ball, para):
@@ -260,30 +277,50 @@ def processBallImg(img, ball, para):
     ball.converToBinary(para[6])
     ball.getCenter(contoursRange=tuple(para[7:9]), ksize=(para[9], para[9]))
     Distance, HighFlag = ball.calculate(\
-                        PickPosition=glo.PICK_POSITION, Height=glo.HEIGHT)
+        PickPosition=glo.PICK_POSITION, Height=glo.HEIGHT)
     if glo.DEBUG_FLAG is True:
         ball.draw(calFlag=True)
-    return Distance,HighFlag
+    return Distance, HighFlag
+
+class StrategyThread(threading.Thread):
+    def __init__(self, threadID, name, counter):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.name = name
+        self.counter = counter
+    def run(self):
+        while True:
+            if glo.MODE_SELECT == 1:
+                print "Track Delta:", glo.TheTrackDelta
+            elif glo.MODE_SELECT == 2:
+                if glo.TheDistance is not None and glo.TheHighFlag is not None:
+                    print "Distance:", glo.TheDistance
+                    print "HighFlag:", glo.TheHighFlag
+                    if glo.TheDistance < glo.PICK_RANGE_HIGH \
+                        and glo.TheDistance > glo.PICK_RANGE_LOW:
+                        glo.PICK_FLAG = True
+                else:
+                    print "NONE BALL!"
+            else:
+                if glo.TheDistance is not None and glo.TheHighFlag is not None:
+                    if glo.TheDistance < glo.PICK_RANGE_HIGH \
+                       and glo.TheDistance > glo.PICK_RANGE_LOW:
+                        glo.PICK_FLAG = True
+            Control()
+            if glo.MAIN_STOP_FLAG is True:
+                print "strategy thread stop"
+                break
+        exit()
+def signal_handler(signum,frame):
+    glo.MAIN_STOP_FLAG = True
+    print "Receive the signal!!",glo.MAIN_STOP_FLAG
+    cv2.destroyAllWindows()
+    sys.exit()
 
 
 if __name__ == "__main__":
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
     systemInit()
-    count = 0
     while True:
-        if glo.MODE_SELECT == 1:
-            print "delta:", glo.TheTrackDelta
-        elif glo.MODE_SELECT == 2:
-            if glo.TheDistance is not None and glo.TheHighFlag is not None:
-                if glo.TheDistance < glo.PICK_RANGE:
-                    glo.PICK_FLAG = True
-        else:
-            if glo.TheDistance is not None and glo.TheHighFlag is not None:
-                if glo.TheDistance < glo.PICK_RANGE:
-                    glo.PICK_FLAG = True
-        Control()
-        count += 1
-        if count > 80000:
-            break
-    glo.MAIN_STOP_FLAG = True
-    cv2.destroyAllWindows()
-    exit()
+        time.sleep(1)
