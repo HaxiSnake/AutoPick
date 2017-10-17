@@ -1,0 +1,60 @@
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd6
+Corrupt JPEG data: 3 extraneous bytes before marker 0xd0
+Exception in thread Strategy:
+Traceback (most recent call last):
+  File "/usr/lib/python2.7/threading.py", line 801, in __bootstrap_inner
+    self.run()
+  File "speed.py", line 191, in run
+    if len(glo.TheFlagCount) > glo.TheFlagCountMin :
+TypeError: object of type 'int' has no len()
+
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd4
+Corrupt JPEG data: 2 extraneous bytes before marker 0xd4
+Corrupt JPEG data: 4 extraneous bytes before marker 0xd2
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd6
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd6
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd2
+Corrupt JPEG data: 2 extraneous bytes before marker 0xd6
+Corrupt JPEG data: 3 extraneous bytes before marker 0xd0
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd5
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd2
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd5
+Corrupt JPEG data: 2 extraneous bytes before marker 0xd2
+Corrupt JPEG data: 3 extraneous bytes before marker 0xd4
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd4
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd0
+Corrupt JPEG data: 2 extraneous bytes before marker 0xd3
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd2
+Corrupt JPEG data: 2 extraneous bytes before marker 0xd3
+Corrupt JPEG data: 2 extraneous bytes before marker 0xd5
+Corrupt JPEG data: 4 extraneous bytes before marker 0xd6
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd0
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd4
+Corrupt JPEG data: 2 extraneous bytes before marker 0xd3
+Corrupt JPEG data: 3 extraneous bytes before marker 0xd3
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd4
+Corrupt JPEG data: 2 extraneous bytes before marker 0xd1
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd2
+Corrupt JPEG data: 2 extraneous bytes before marker 0xd6
+Corrupt JPEG data: 2 extraneous bytes before marker 0xd3
+Corrupt JPEG data: 2 extraneous bytes before marker 0xd2
+Corrupt JPEG data: 2 extraneous bytes before marker 0xd1
+Corrupt JPEG data: 6 extraneous bytes before marker 0xd6
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd1
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd1
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd5
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd0
+Corrupt JPEG data: 6 extraneous bytes before marker 0xd5
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd3
+Corrupt JPEG data: 5 extraneous bytes before marker 0xd0
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd2
+Corrupt JPEG data: 2 extraneous bytes before marker 0xd3
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd3
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd1
+Corrupt JPEG data: 2 extraneous bytes before marker 0xd5
+Corrupt JPEG data: 1 extraneous bytes before marker 0xd4
+Corrupt JPEG data: 2 extraneous bytes before marker 0xd1
+Corrupt JPEG data: 3 extraneous bytes before marker 0xd1
+Corrupt JPEG data: 2 extraneous bytes before marker 0xd7
+Corrupt JPEG data: 4 extraneous bytes before marker 0xd5
+Corrupt JPEG data: 3 extraneous bytes before marker 0xd6
