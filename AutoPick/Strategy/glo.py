@@ -1,8 +1,8 @@
 #global flags
 KOBUKI_COM   = "/dev/ttyUSB0"
 DOBOT_COM    = "/dev/ttyUSB1"
-TRACK_CAM    = 1
-BALL_CAM     = 0
+TRACK_CAM    = 0
+BALL_CAM     = 1
 #BALL_CONFIG  = ".\\Config\\BallConfig.txt"
 BALL_CONFIG  = "./Config/BallConfig.txt"
 #TRACK_CONFIG = ".\\Config\\TrackConfig.txt"
@@ -14,15 +14,17 @@ MAIN_STOP_FLAG = False
 PICK_FLAG   = False
 #global flags
 #variable
-KOBUKI_SPEED = 0x60
-PICK_POSITION= 100
+KOBUKI_SPEED = 0x65
+PICK_POSITION= 95 
 HEIGHT       = 100
 PICK_RANGE_HIGH  = 40
-PICK_RANGE_LOW   = -10
-GRUB_TIME    = 3
+PICK_RANGE_LOW   = -5
+GRUB_TIME    = 5
 GOSTR_TIME   = 0.8
 TRACK_P      = 15000.0
 TRACK_D      = 10.0
+TRACK_PROSPECT = 480*0.5*2/3
+TRACK_TARGET   = 640*0.5/2+10 
 TheTrackDelta = 0.0
 TheThreadLock = None
 TheDistance  = None

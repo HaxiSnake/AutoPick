@@ -196,11 +196,13 @@ def processTrackImg(img, track, para):
     track.converToBinary(para[6])
     track.getCenter(blurSize=para[7], minVal=para[8], maxVal=para[8] * 3,\
                     linePointCount=para[9], minLineLength=para[10], maxLineGap=para[11],\
-                    slopeThreshold=math.tan(math.pi / 6))
+                    slopeThreshold=math.tan(math.pi / 6),\
+                    defaultPos=int(glo.TRACK_TARGET))
+    tempDelta=track.getDelta(default=False,\
+            prospect=glo.TRACK_PROSPECT,target=glo.TRACK_TARGET)
     if glo.DEBUG_FLAG is True:
-        track.draw()
-    return track.getDelta()
-
+        track.draw(DeltaFlag=True)
+    return tempDelta
 
 class BallThread(threading.Thread):
     def __init__(self, threadID, name, counter):

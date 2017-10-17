@@ -240,12 +240,14 @@ class FindTrack(FindObject):
         self.blurtImg= None
         self.edges   = None
         self.debugFlag = debugFlag
+        self.prospect = None
+        self.target   = None
         self.imgSize = img.shape
         self.Middle = Line(self.imgSize[1]/2,0,float("inf"))
         print ("A FindTrack Class is created!")
     def getCenter(self,blurSize=15,minVal=50,maxVal=150,\
         linePointCount=60,minLineLength=120,maxLineGap=10,\
-        slopeThreshold=math.tan(math.pi/6)):
+        slopeThreshold=math.tan(math.pi/6),defaultPos=0):
         '''Get the middle line of the track
             input:
                 blurSize=15,        #size for blur
@@ -323,13 +325,13 @@ class FindTrack(FindObject):
                 #middle line equation
                 self.Middle.update(tempMiddleX[0],tempMiddleY[0],tempMiddleK)
             else:
-                # if we can not get two side lines ,middle line is set to middle of the img
-                self.Middle.update(self.imgSize[1]/2,0,float("inf"))
+                # if we can not get two side lines ,middle line is set to defaultPos
+                self.Middle.update(defaultPos, 0, float("inf"))
         else:
-            # if there are no lines,middle line is set to middle of the img
+            # if there are no lines,middle line is set to defaultPos
             self.leftLines = None
             self.rightLines= None
-            self.Middle.update(self.imgSize[1]/2,0,float("inf"))
+            self.Middle.update(defaultPos, 0, float("inf"))
         if self.debugFlag is True:
             cv2.imshow("canny",self.edges)   
             if self.leftLines is not None :
@@ -349,7 +351,7 @@ class FindTrack(FindObject):
             return self.Middle
         else:
             return self.Middle
-    def draw(self):
+    def draw(self,DeltaFlag=False):
         if self.leftLines is not None :
             for item in self.leftLines:
                 cv2.line(self.lineTemp,(item[0],item[1]),(item[2],item[3]  ),(255,0,0),3)
@@ -363,14 +365,20 @@ class FindTrack(FindObject):
         (int(self.Middle.getX(0)),0),\
         (int(self.Middle.getX(self.imgSize[0])),self.imgSize[0]),\
         (0,255,255),3)
+        if DeltaFlag is True:
+            print "DeltaFlag is true"
+            cv2.line(self.lineTemp,\
+                     (self.target, 0),\
+                     (self.target, self.imgSize[0]),\
+                     (0, 255, 255), 3)
         cv2.imshow("FindTrack",self.lineTemp)
     def getDelta(self,default=True,prospect=0,target=0):
         if default is True:
-            self.prospect = self.imgSize[0]*2.0/3
-            self.target   = self.imgSize[1]/2.0
+            self.prospect = int(self.imgSize[0]*2.0/3)
+            self.target   = int(self.imgSize[1]/2.0)
         else:
-            self.prospect = prospect
-            self.target   = target
+            self.prospect = int(prospect)
+            self.target   = int(target)
         return int(self.target-self.Middle.getX(self.prospect))
 
 class BallShow:
